@@ -9,6 +9,14 @@ const Navbar = () => {
       element: "Home",
     },
     {
+      path: "/donar",
+      element: "Donar",
+    },
+    {
+      path: "/add-blood-request",
+      element: "Donate Request",
+    },
+    {
       path: "/about",
       element: "About",
     },

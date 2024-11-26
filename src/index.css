@@ -5,3 +5,7 @@
 .bg-banner{
   background: url("../Image/gettyimages-istockphoto-1005715630copy.jpg");
 }
+
+*{
+    font-family: "Roboto", serif;
+}

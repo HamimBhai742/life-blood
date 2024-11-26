@@ -6,7 +6,7 @@ const SearchDonors = () => {
   const [date, setDate] = useState(null);
 
   return (
-    <div className="flex flex-col items-center bg-gray-50 py-8">
+    <div className="flex flex-col items-center py-8">
       <h1 className="text-xl font-semibold mb-6">Search Donors</h1>
       <div className="flex flex-wrap gap-4">
         {/* Blood Group Dropdown */}

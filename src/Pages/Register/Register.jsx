@@ -5,8 +5,12 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 
+import { imgUpload } from "../../Components/UploadImage/UploadImage";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+
 export default function Register() {
   const { createUser, logOut } = useAuth();
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -15,10 +19,22 @@ export default function Register() {
     password: "",
     photo: null,
   });
-
+  const axiosPublic = useAxiosPublic();
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // setFormData({ ...formData, [name]: value });
+
+    const phoneRegex = /^01[3,4,5,6,7,8,9]\d{8}$/;
+
+    // Update state
     setFormData({ ...formData, [name]: value });
+
+    // Live validation
+    if (value && !phoneRegex.test(value)) {
+      setError("Phone number must be 11 digits, start with 01, and be valid.");
+    } else {
+      setError("");
+    }
   };
 
   const handlePhotoChange = (e) => {
@@ -28,12 +44,26 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle form submission (e.g., API call)
-    console.log("Form Data:", formData);
+
     const { email, password } = formData;
     try {
-      await createUser(email, password).then((res) => {
+      console.log("Form Data:", formData);
+      const image = { image: formData.photo };
+      const img = await imgUpload(image);
+      delete formData.photo;
+      const userData = {
+        ...formData,
+        img,
+        time: new Date(),
+        role: "user",
+      };
+      console.log(userData);
+      console.log(img);
+      await createUser(email, password).then(async (res) => {
         console.log(res.user);
         if (res?.user) {
+          const { data } = await axiosPublic.post("/user", userData);
+          console.log(data);
           logOut();
           navigate("/login");
           toast.success("Register Successful. Now you have login your Id.");
@@ -99,6 +129,7 @@ export default function Register() {
               placeholder="Enter your phone number"
               required
             />
+            <p className="text-red-600 text-sm">{error && error}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-red-700">
