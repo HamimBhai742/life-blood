@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import toast from "react-hot-toast";
+import useAuth from "../../hooks/useAuth";
+import useDonar from "../../hooks/useDonar";
+import { ImSpinner2 } from "react-icons/im";
 
 const BloodDonationRequest = () => {
   const axiosPublic = useAxiosPublic();
+  const { user } = useAuth();
+  const [ownDonar] = useDonar();
+  const [loading, setLoading] = useState(false);
+  console.log(ownDonar);
   const [formData, setFormData] = useState({
     donorName: "",
     bloodGroup: "",
@@ -29,11 +36,22 @@ const BloodDonationRequest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    if (ownDonar?.isDonate === false) {
+      console.log(ownDonar);
+      toast.error("You have already donate request");
+      return;
+    }
     console.log("Form Data Submitted:", formData);
+    const date = new Date();
     const donar = {
       ...formData,
+      email: user?.email,
+      isDonate: false,
       status: "pending",
-      date: new Date(),
+      date: `${date.getFullYear().toString()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
     };
     console.log(donar);
     try {
@@ -43,10 +61,12 @@ const BloodDonationRequest = () => {
           "Request send successful. Please wait for admin approval."
         );
       }
+      setLoading(false);
       console.log(data);
     } catch (err) {
       toast.error(error.message);
       console.log(err);
+      setLoading(false);
     }
   };
 
@@ -172,8 +192,8 @@ const BloodDonationRequest = () => {
             required
           >
             <option value="">Select Donor Type</option>
-            <option value="Regular">Regular</option>
-            <option value="Emergency">Emergency</option>
+            <option value="volunteer">Volunteer</option>
+            <option value="replacement">Replacement</option>
           </select>
         </div>
 
@@ -203,7 +223,11 @@ const BloodDonationRequest = () => {
           type="submit"
           className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none"
         >
-          Submit Request
+          {loading ? (
+            <ImSpinner2 className="animate-spin m-auto" />
+          ) : (
+            "Submit Request"
+          )}
         </button>
       </form>
     </div>

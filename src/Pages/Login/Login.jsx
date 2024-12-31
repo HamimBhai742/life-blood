@@ -1,29 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import { ImSpinner2 } from "react-icons/im";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const handelSubmitBtn = (e) => {
     e.preventDefault();
+    setLoading(true);
     const email = e.target.email.value;
     const password = e.target.password.value;
     console.log(email, password);
     try {
       signIn(email, password)
         .then((res) => {
-        if (res.user) {
-          navigate("/");
-          toast.success("Login Successful");
-        }
+          if (res.user) {
+            navigate("/");
+            toast.success("Login Successful");
+            setLoading(false);
+          }
         })
-        .catch(err => {
-          toast.error(err.message)
+        .catch((err) => {
+          setLoading(false);
+          toast.error(err.message);
         });
     } catch (err) {
+      setLoading(false);
       toast.error(error.message);
     }
   };
@@ -78,7 +84,7 @@ const Login = () => {
             type="submit"
             className="w-full py-3 text-white bg-red-700 rounded-lg hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
           >
-            Login
+            {loading ? <ImSpinner2 className="animate-spin m-auto" /> : "Login"}
           </button>
         </form>
 

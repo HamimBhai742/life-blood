@@ -1,16 +1,18 @@
 // Register.js
 import React, { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft, FaSpinner } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 
 import { imgUpload } from "../../Components/UploadImage/UploadImage";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
+import { ImSpinner2 } from "react-icons/im";
 
 export default function Register() {
   const { createUser, logOut } = useAuth();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -44,34 +46,34 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle form submission (e.g., API call)
-
+    setLoading(true);
     const { email, password } = formData;
     try {
-      console.log("Form Data:", formData);
       const image = { image: formData.photo };
       const img = await imgUpload(image);
       delete formData.photo;
+      delete formData.password;
       const userData = {
         ...formData,
         img,
         time: new Date(),
         role: "user",
       };
-      console.log(userData);
-      console.log(img);
       await createUser(email, password).then(async (res) => {
-        console.log(res.user);
+        console.log(userData);
         if (res?.user) {
           const { data } = await axiosPublic.post("/user", userData);
           console.log(data);
           logOut();
           navigate("/login");
           toast.success("Register Successful. Now you have login your Id.");
+          setLoading(false);
         }
       });
     } catch (err) {
       toast.error(err.message);
       console.log(err);
+      setLoading(false);
     }
   };
 
@@ -161,7 +163,11 @@ export default function Register() {
             type="submit"
             className="w-full px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-400"
           >
-            Register
+            {loading ? (
+              <ImSpinner2 className="animate-spin m-auto" />
+            ) : (
+              "Register"
+            )}
           </button>
         </form>
         <div className="text-center">

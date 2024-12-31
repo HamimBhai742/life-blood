@@ -1,8 +1,14 @@
 import React from "react";
 import { FaFacebook, FaTwitter, FaYoutube } from "react-icons/fa6";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
+import useUser from "../../hooks/useUser";
 
 const Navbar = () => {
+  const { user, logOut } = useAuth();
+  const [userDb] = useUser();
+  console.log(userDb?.img);
   const navItems = [
     {
       path: "/",
@@ -13,20 +19,12 @@ const Navbar = () => {
       element: "Donar",
     },
     {
-      path: "/add-blood-request",
-      element: "Donate Request",
+      path: userDb?.role === "admin" ? "/add-donar" : "/add-blood-request",
+      element: userDb?.role === "admin" ? "Donar Request" : "Donate Request",
     },
     {
       path: "/about",
       element: "About",
-    },
-    {
-      path: "/login",
-      element: "Login",
-    },
-    {
-      path: "/register",
-      element: "Register",
     },
   ];
   return (
@@ -72,6 +70,56 @@ const Navbar = () => {
           <FaTwitter />
         </div>
         <h3>SMS to 01625524255</h3>
+      </div>
+      <div className="dropdown dropdown-end">
+        <div
+          tabIndex={0}
+          role="button"
+          className="btn btn-ghost btn-circle avatar"
+        >
+          <div className="w-14 rounded-full">
+            <img
+              alt="Tailwind CSS Navbar component"
+              src={
+                user
+                  ? `${userDb?.img}`
+                  : "https://png.pngtree.com/png-vector/20220819/ourmid/pngtree-protection-healthcare-assistance-human-vector-png-image_33343756.png"
+              }
+            />
+          </div>
+        </div>
+        <ul
+          tabIndex={0}
+          className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-28 p-2 shadow"
+        >
+          <li>
+            <a className="justify-between text-black">Profile</a>
+          </li>
+          {userDb.role==="user" && (
+            <li>
+              <Link
+                to={"/my-donate-request"}
+                className="justify-between text-black"
+              >
+                My Donate Request
+              </Link>
+            </li>
+          )}
+          {/* <li>
+            <a>Settings</a>
+          </li> */}
+          <li className="text-black">
+            {user ? (
+              <button
+                onClick={() => logOut(toast.success("Logout Successful"))}
+              >
+                Log Out
+              </button>
+            ) : (
+              <Link to="login">Log In</Link>
+            )}
+          </li>
+        </ul>
       </div>
     </div>
   );

@@ -1,12 +1,14 @@
 import React from 'react';
 import Banner from '../../Components/Banner/Banner';
-import SearchDonors from '../../Components/SearchDonner/SearchDoner';
+import BenefitsSection from './Benifit';
+import DonationCamps from './DOnationCamp';
 
 const Home = () => {
     return (
         <div>
             <Banner />
-            <SearchDonors/>
+            <BenefitsSection />
+            <DonationCamps/>
         </div>
     );
 };

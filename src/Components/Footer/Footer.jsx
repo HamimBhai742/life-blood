@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-red-500 text-white">
+    <footer className="bg-red-500 text-white mt-8">
       {/* Top zig-zag border */}
       <div className="w-full h-4 bg-white">
         <svg

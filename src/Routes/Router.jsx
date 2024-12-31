@@ -7,6 +7,10 @@ import Login from "../Pages/Login/Login";
 import Register from "../Pages/Register/Register";
 import Donar from "../Pages/Donar/Donar";
 import BloodDonationRequest from "../Pages/AddBloodRequest/AddBloodRequset";
+import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
+import AddDonar from "../Pages/AddDonar/AddDonar";
+import AdimnRoute from "./ProtectedRoute/AdminProtected";
+import MyDonateRequest from "../Pages/MyDonateRequest/MyDonateRequest";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,9 +28,26 @@ const router = createBrowserRouter([
         path: "/donar",
         element: <Donar />,
       },
+
       {
         path: "/add-blood-request",
-        element: <BloodDonationRequest />,
+        element: (
+          <ProtectedRoute>
+            <BloodDonationRequest />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/add-donar",
+        element: (
+          <AdimnRoute>
+            <AddDonar />
+          </AdimnRoute>
+        ),
+      },
+      {
+        path: "/my-donate-request",
+        element: <MyDonateRequest />,
       },
     ],
   },

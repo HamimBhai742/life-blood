@@ -1,65 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchDonors from "../../Components/SearchDonner/SearchDoner";
-
-const donors = [
-  {
-    name: "Oronno Anam",
-    group: "AB+",
-    district: "Dhaka",
-  },
-  {
-    name: "Maksudur Rahman",
-    group: "B+",
-    district: "Brahmanbaria",
-  },
-  {
-    name: "Md Iqbal Hossain",
-    group: "AB+",
-    district: "Dhaka",
-  },
-  {
-    name: "Obaydul Ahmed Faraz",
-    group: "O+",
-    district: "Munshiganj",
-  },
-  {
-    name: "Abu",
-    group: "B+",
-    district: "Munshiganj",
-  },
-  {
-    name: "Aditi",
-    group: "B+",
-    district: "Dhaka",
-  },
-  {
-    name: "Md. Mehedi Hassan",
-    group: "O+",
-    district: "Dhaka",
-  },
-  {
-    name: "Ali Ahsan",
-    group: "O+",
-    district: "Sylhet",
-  },
-  {
-    name: "Asad",
-    group: "B+",
-    district: "Khulna",
-  },
-  {
-    name: "Ashikur Alam",
-    group: "AB+",
-    district: "Gazipur",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import toast from "react-hot-toast";
 
 const Donar = () => {
+  const axiosPublic = useAxiosPublic();
+  const [donors,setDonors]=useState([])
+  const { data: donars = [], refetch } = useQuery({
+    queryKey: ["donars"],
+    queryFn: async () => {
+      const { data } = await axiosPublic.get("/donars-blood");
+      setDonors(data)
+      return data;
+    },
+  });
+  console.log(donars);
+  const handelSearchBtn = async (e) => {
+    e.preventDefault();
+    const bloodGroup = e.target.bloodGroup.value;
+    const district = e.target.district.value;
+    const donorType = e.target.donorType.value;
+    console.log(bloodGroup, district, donorType);
+    try {
+      const { data } = await axiosPublic.get(
+        `/search-donor?bloodGroup=${bloodGroup}&district=${district}&donorType=${donorType}`
+      );
+      console.log(data);
+      toast.success("Search successful");
+      setDonors(data)
+    } catch (err) {
+      console.log(err.message);
+      toast.error(err.message)
+    }
+  };
+  console.log(donors)
   return (
     <div className=" min-h-screen px-4">
       {/* Search Filters */}
       <div className="bg-red-50">
-        <SearchDonors />
+        <SearchDonors handelSearchBtn ={handelSearchBtn}/>
       </div>
       {/* Donor Count */}
       <div className="bg-red-500 p-4 rounded-md my-8 text-gray-50">
@@ -68,7 +48,7 @@ const Donar = () => {
 
       {/* Donor Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {donors.map((donor, index) => (
+        {donors.length>0?donors.map((donor, index) => (
           <div
             key={index}
             className="bg-white p-4 border rounded-lg shadow-md flex flex-col items-center text-center"
@@ -87,11 +67,15 @@ const Donar = () => {
                 />
               </svg>
             </div>
-            <p className="font-bold">Name: {donor.name}</p>
-            <p className="text-gray-600">Group: {donor.group}</p>
-            <p className="text-gray-600">District: {donor.district}</p>
+            <p className="font-bold">Name: {donor?.donorName}</p>
+            <p className="text-gray-600">Group: {donor?.bloodGroup}</p>
+            <p className="text-gray-600">District: {donor?.district}</p>
+            <p className="text-gray-600">Phone: {donor?.contactNumber}</p>
+            <p className="text-gray-600">Donor Type: {donor?.donorType}</p>
           </div>
-        ))}
+        )) : <div className="min-h-screen flex justify-center items-center">
+            <h2 className="text-5xl text-red-600 text-center">No Donors Found.</h2>
+        </div>}
       </div>
     </div>
   );
